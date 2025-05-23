@@ -12,8 +12,15 @@ import java.util.Map;
  * This class provides the service of converting country codes to their names.
  */
 public class CountryCodeConverter {
-
-    // TODO Task: pick appropriate instance variable(s) to store the data necessary for this class
+    // Number of countries and thereby number of entries in files are fairly static.
+    public static final int TOTAL_COUNTRIES = 260;
+    public static final int ALPHA3_IDX = 3;
+    public static final int JSON_PARSE_SIZE = 4;
+    public static final String DELIMITER = "\t";
+    private final Map<String, String> countryToAlphaCode;
+    private final Map<String, Integer> countryToId;
+    // Reverse map,
+    private final Map<String, String> alphaCodeToCountry;
 
     /**
      * Default constructor which will load the country codes from "country-codes.txt"
@@ -25,50 +32,62 @@ public class CountryCodeConverter {
 
     /**
      * Overloaded constructor which allows us to specify the filename to load the country code data from.
+     *
      * @param filename the name of the file in the resources folder to load the data from
      * @throws RuntimeException if the resource file can't be loaded properly
      */
     public CountryCodeConverter(String filename) {
+        countryToAlphaCode = new HashMap<>(TOTAL_COUNTRIES);
+        countryToId = new HashMap<>(TOTAL_COUNTRIES);
+        alphaCodeToCountry = new HashMap<>(TOTAL_COUNTRIES);
 
         try {
             List<String> lines = Files.readAllLines(Paths.get(getClass()
                     .getClassLoader().getResource(filename).toURI()));
-
-            // TODO Task: use lines to populate the instance variable(s)
-
+            for (String line : lines) {
+                String[] parts = line.split(DELIMITER);
+                if (parts.length >= JSON_PARSE_SIZE) {
+                    String countryName = parts[0].trim();
+                    // Using Alpha-3
+                    String alphaCode = parts[2].trim();
+                    int countryNum = Integer.parseInt(parts[ALPHA3_IDX]);
+                    this.countryToAlphaCode.put(countryName, alphaCode);
+                    this.countryToId.put(countryName, countryNum);
+                    this.alphaCodeToCountry.put(alphaCode, countryName);
+                }
+            }
         }
         catch (IOException | URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
-
     }
 
     /**
      * Returns the name of the country for the given country code.
+     *
      * @param code the 3-letter code of the country
      * @return the name of the country corresponding to the code
      */
     public String fromCountryCode(String code) {
-        // TODO Task: update this code to use an instance variable to return the correct value
-        return code;
+        return this.alphaCodeToCountry.getOrDefault(code, "Country Code Not Supported.");
     }
 
     /**
      * Returns the code of the country for the given country name.
+     *
      * @param country the name of the country
      * @return the 3-letter code of the country
      */
     public String fromCountry(String country) {
-        // TODO Task: update this code to use an instance variable to return the correct value
-        return country;
+        return this.countryToAlphaCode.getOrDefault(country, "Country Not Supported.");
     }
 
     /**
      * Returns how many countries are included in this code converter.
+     *
      * @return how many countries are included in this code converter.
      */
     public int getNumCountries() {
-        // TODO Task: update this code to use an instance variable to return the correct value
-        return 0;
+        return this.countryToId.size();
     }
 }

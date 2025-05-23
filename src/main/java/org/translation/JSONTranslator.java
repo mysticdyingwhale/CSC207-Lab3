@@ -5,7 +5,9 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 
@@ -14,8 +16,8 @@ import org.json.JSONArray;
  * data from a JSON file. The data is read in once each time an instance of this class is constructed.
  */
 public class JSONTranslator implements Translator {
-
-    // TODO Task: pick appropriate instance variables for this class
+    private final Map<String, List<String>> codeToLangMap;
+    private final Map<String, Map<String, String>> translations;
 
     /**
      * Constructs a JSONTranslator using data from the sample.json resources file.
@@ -30,16 +32,32 @@ public class JSONTranslator implements Translator {
      * @throws RuntimeException if the resource file can't be loaded properly
      */
     public JSONTranslator(String filename) {
-        // read the file to get the data to populate things...
+        codeToLangMap = new HashMap<>();
+        translations = new HashMap<>();
+
         try {
-
-            String jsonString = Files.readString(Paths.get(getClass().getClassLoader().getResource(filename).toURI()));
-
+            String jsonString = Files.readString(Paths.get(getClass()
+                    .getClassLoader().getResource(filename).toURI()));
             JSONArray jsonArray = new JSONArray(jsonString);
 
-            // TODO Task: use the data in the jsonArray to populate your instance variables
-            //            Note: this will likely be one of the most substantial pieces of code you write in this lab.
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject entry = jsonArray.getJSONObject(i);
+                String countryCode = entry.getString("alpha3");
 
+                Map<String, String> countryTranslations = new HashMap<>();
+                List<String> languages = new ArrayList<>();
+
+                for (String key : entry.keySet()) {
+                    if (!List.of("id", "alpha2", "alpha3").contains(key)) {
+                        String translatedName = entry.getString(key);
+                        countryTranslations.put(key, translatedName);
+                        languages.add(key);
+                    }
+                }
+
+                translations.put(countryCode, countryTranslations);
+                codeToLangMap.put(countryCode, languages);
+            }
         }
         catch (IOException | URISyntaxException ex) {
             throw new RuntimeException(ex);

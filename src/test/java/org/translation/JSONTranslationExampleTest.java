@@ -12,6 +12,7 @@ public class JSONTranslationExampleTest {
     public void getCountryNameTranslation() {
         String expected = jsonTranslationExample.getCanadaCountryNameSpanishTranslation();
         String result = jsonTranslationExample.getCountryNameTranslation("can", "es");
-        assertEquals("Translating 'can' to 'es' should be " + expected + " but was " + result, expected, result);
+        assertEquals("Translating 'can' to 'es' should be " + expected + " but was " + result,
+                expected, result);
     }
 }

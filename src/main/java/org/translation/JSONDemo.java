@@ -17,8 +17,6 @@ public class JSONDemo {
         JSONArray jsonArray = new JSONArray(jsonData);
         System.out.println(jsonArray);
         System.out.println(jsonArray.length());
-        // note that we can use jsonArray.get, but its return type is just Object,
-        // which isn't as useful as below.
         JSONObject jsonObject = jsonArray.getJSONObject(0);
         System.out.println(jsonObject);
         System.out.println(jsonObject.getString("key1"));
@@ -33,8 +31,6 @@ public class JSONDemo {
      * @return value of key "key1" from the second object in the given jsonArray
      */
     public static String getKeyOneOfSecond(JSONArray jsonArray) {
-        // TODO: Complete this method.
-        return "";
+        return jsonArray.getJSONObject(1).getString("key1");
     }
-
 }
