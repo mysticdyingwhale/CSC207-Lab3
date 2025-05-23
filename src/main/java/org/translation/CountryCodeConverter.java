@@ -44,16 +44,23 @@ public class CountryCodeConverter {
         try {
             List<String> lines = Files.readAllLines(Paths.get(getClass()
                     .getClassLoader().getResource(filename).toURI()));
-            for (String line : lines) {
+
+            // Skip header line (index 0)
+            for (int i = 1; i < lines.size(); i++) {
+                String line = lines.get(i);
                 String[] parts = line.split(DELIMITER);
                 if (parts.length >= JSON_PARSE_SIZE) {
                     String countryName = parts[0].trim();
-                    // Using Alpha-3
                     String alphaCode = parts[2].trim();
-                    int countryNum = Integer.parseInt(parts[ALPHA3_IDX]);
-                    this.countryToAlphaCode.put(countryName, alphaCode);
-                    this.countryToId.put(countryName, countryNum);
-                    this.alphaCodeToCountry.put(alphaCode, countryName);
+                    try {
+                        int countryNum = Integer.parseInt(parts[ALPHA3_IDX].trim());
+                        this.countryToAlphaCode.put(countryName, alphaCode);
+                        this.countryToId.put(countryName, countryNum);
+                        this.alphaCodeToCountry.put(alphaCode, countryName);
+                    }
+                    catch (NumberFormatException e) {
+                        System.err.println("Skipping invalid numeric code for: " + countryName);
+                    }
                 }
             }
         }

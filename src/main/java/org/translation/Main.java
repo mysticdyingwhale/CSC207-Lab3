@@ -35,29 +35,30 @@ public class Main {
      */
     public static void runProgram(Translator translator) {
         String breakStr = "quit";
+        CountryCodeConverter countryConverter = new CountryCodeConverter();
+        LanguageCodeConverter langConverter = new LanguageCodeConverter();
+
         while (true) {
-            String country = promptForCountry(translator);
-            if (breakStr.equals(country)) {
+            String countryName = promptForCountry(translator);
+            if (breakStr.equals(countryName)) {
                 break;
             }
-            // TODO Task: Once you switch promptForCountry so that it returns the country
-            //            name rather than the 3-letter country code, you will need to
-            //            convert it back to its 3-letter country code when calling promptForLanguage
-            String language = promptForLanguage(translator, country);
-            if (breakStr.equals(language)) {
+
+            String countryCode = countryConverter.fromCountry(countryName);
+            String languageName = promptForLanguage(translator, countryCode);
+            if (breakStr.equals(languageName)) {
                 break;
             }
-            // TODO Task: Once you switch promptForLanguage so that it returns the language
-            //            name rather than the 2-letter language code, you will need to
-            //            convert it back to its 2-letter language code when calling translate.
-            //            Note: you should use the actual names in the message printed below though,
-            //            since the user will see the displayed message.
-            System.out.println(country + " in " + language + " is " + translator.translate(country, language));
+
+            String languageCode = langConverter.fromLanguage(languageName);
+            String translation = translator.translate(countryCode, languageCode);
+
+            System.out.println(countryName + " in " + languageName + " is "
+                    + (translation != null ? translation : "No translation available"));
+
             System.out.println("Press enter to continue or quit to exit.");
             Scanner s = new Scanner(System.in);
-            String textTyped = s.nextLine();
-
-            if (breakStr.equals(textTyped)) {
+            if (breakStr.equals(s.nextLine())) {
                 break;
             }
         }
