@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -35,13 +38,14 @@ public class JSONTranslator implements Translator {
         translations = new HashMap<>();
 
         try {
-            String jsonString = Files.readString(Paths.get(getClass()
-                    .getClassLoader().getResource(filename).toURI()));
+            String jsonString = Files.readString(Paths.get(getClass().getClassLoader().getResource(filename)
+                    .toURI()));
             JSONArray jsonArray = new JSONArray(jsonString);
 
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject entry = jsonArray.getJSONObject(i);
-                String countryCode = entry.getString("alpha3");
+                // Convert to uppercase to match CountryCodeConverter
+                String countryCode = entry.getString("alpha3").toUpperCase();
 
                 Map<String, String> countryTranslations = new HashMap<>();
                 List<String> languages = new ArrayList<>();
@@ -63,10 +67,16 @@ public class JSONTranslator implements Translator {
         }
     }
 
-    // Update the methods in JSONTranslator
     @Override
     public List<String> getCountryLanguages(String country) {
-        return new ArrayList<>(codeToLangMap.getOrDefault(country, Collections.emptyList()));
+        List<String> result = new ArrayList<>();
+        if (country != null) {
+            List<String> languages = codeToLangMap.get(country.toUpperCase());
+            if (languages != null) {
+                result.addAll(languages);
+            }
+        }
+        return result;
     }
 
     @Override
@@ -76,10 +86,13 @@ public class JSONTranslator implements Translator {
 
     @Override
     public String translate(String country, String language) {
-        Map<String, String> countryTranslations = translations.get(country);
-        if (countryTranslations == null) {
-            return null;
+        String result = null;
+        if (country != null) {
+            Map<String, String> countryTranslations = translations.get(country.toUpperCase());
+            if (countryTranslations != null) {
+                result = countryTranslations.get(language);
+            }
         }
-        return countryTranslations.get(language);
+        return result;
     }
 }

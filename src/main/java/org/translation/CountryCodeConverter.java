@@ -51,14 +51,14 @@ public class CountryCodeConverter {
                 String[] parts = line.split(DELIMITER);
                 if (parts.length >= JSON_PARSE_SIZE) {
                     String countryName = parts[0].trim();
-                    String alphaCode = parts[2].trim();
+                    String alphaCode = parts[2].trim().toUpperCase();
                     try {
                         int countryNum = Integer.parseInt(parts[ALPHA3_IDX].trim());
-                        this.countryToAlphaCode.put(countryName, alphaCode);
+                        this.countryToAlphaCode.put(countryName.toLowerCase(), alphaCode);
                         this.countryToId.put(countryName, countryNum);
                         this.alphaCodeToCountry.put(alphaCode, countryName);
                     }
-                    catch (NumberFormatException e) {
+                    catch (NumberFormatException ex) {
                         System.err.println("Skipping invalid numeric code for: " + countryName);
                     }
                 }
@@ -76,7 +76,8 @@ public class CountryCodeConverter {
      * @return the name of the country corresponding to the code
      */
     public String fromCountryCode(String code) {
-        return this.alphaCodeToCountry.getOrDefault(code, "Country Code Not Supported.");
+        String codeUpper = code.trim().toUpperCase();
+        return this.alphaCodeToCountry.getOrDefault(codeUpper, "Country Code Not Supported.");
     }
 
     /**
@@ -86,7 +87,7 @@ public class CountryCodeConverter {
      * @return the 3-letter code of the country
      */
     public String fromCountry(String country) {
-        return this.countryToAlphaCode.getOrDefault(country, "Country Not Supported.");
+        return this.countryToAlphaCode.get(country.toLowerCase());
     }
 
     /**

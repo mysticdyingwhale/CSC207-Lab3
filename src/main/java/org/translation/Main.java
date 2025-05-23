@@ -22,7 +22,7 @@ public class Main {
      * @param args not used by the program
      */
     public static void main(String[] args) {
-        Translator translator = new JSONTranslator(null);
+        Translator translator = new JSONTranslator();
         runProgram(translator);
     }
 
@@ -53,8 +53,14 @@ public class Main {
             String languageCode = langConverter.fromLanguage(languageName);
             String translation = translator.translate(countryCode, languageCode);
 
-            System.out.println(countryName + " in " + languageName + " is "
-                    + (translation != null ? translation : "No translation available"));
+            if (translation != null) {
+                System.out.println(countryName + " in " + languageName + " is "
+                        + translation);
+            }
+            else {
+                System.out.println(countryName + " in " + languageName + " is "
+                        + "No translation available");
+            }
 
             System.out.println("Press enter to continue or quit to exit.");
             Scanner s = new Scanner(System.in);

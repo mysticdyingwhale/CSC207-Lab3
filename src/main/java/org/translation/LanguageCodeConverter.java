@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -39,17 +38,18 @@ public class LanguageCodeConverter {
         langCodeToName = new HashMap<>(TOTAL_LANGUAGES);
 
         try {
-            List<String> lines = Files.readAllLines(Paths.get(getClass()
-                    .getClassLoader().getResource(filename).toURI()));
-            lines.size();
-            Iterator<String> iterator = lines.iterator();
-            while (iterator.hasNext()) {
-                String line = iterator.next();
+            var resource = getClass().getClassLoader().getResource(filename);
+            if (resource == null) {
+                throw new RuntimeException("Resource file '" + filename + "' not found");
+            }
+            List<String> lines = Files.readAllLines(Paths.get(resource.toURI()));
+
+            for (String line : lines) {
                 String[] parts = line.split(DELIMITER);
                 if (parts.length >= 2) {
                     String langName = parts[0].trim();
                     String langCode = parts[1].trim();
-                    this.langNameToCode.put(langName, langCode);
+                    this.langNameToCode.put(langName.toLowerCase(), langCode);
                     this.langCodeToName.put(langCode, langName);
                 }
             }
@@ -76,7 +76,7 @@ public class LanguageCodeConverter {
      * @return the 2-letter code of the language
      */
     public String fromLanguage(String language) {
-        return this.langNameToCode.getOrDefault(language, "Language Not Supported.");
+        return this.langNameToCode.get(language.toLowerCase());
     }
 
     /**
